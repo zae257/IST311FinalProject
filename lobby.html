@@ -25,6 +25,7 @@
 	<h1>PlayerList</h1>
 	  <div id="players">
 		<p></p>
+		<input type="button" value="Ready up" id="ready"/>
 	  </div>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
@@ -32,15 +33,19 @@
 	  $(function () {
 		var socket = io();
 		var username = prompt("Enter a username", "Sword");
-		 
+		
 		socket.emit('player name', username);
 		alert("yes!");
 		
 		socket.on('chat message', function(name){
 		  $('#players').append($('<p>').text(name));
+		  
 		});
 		
-		
+		$('#ready').click(function(){
+			$(this).val("Wait for others");
+			socket.emit('player ready', "test");
+		});
 		
 		/*$('form').submit(function(){
 		  socket.emit('chat message', username + ": " + $('#m').val());
