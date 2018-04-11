@@ -1,7 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var playerList = {};
+var playerList = [];
 var connectCounter = 0;
 var readyCounter = 0;
 var ranPlayerM = 0;
@@ -14,7 +14,7 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
 	socket.on('player name', function(name){
-		playerList.push({username: name, role: '',});
+		playerList.push({username: name, role: ''});
 		console.log(playerList);
 		io.emit('chat message', playerList);
 
@@ -26,7 +26,7 @@ io.on('connection', function(socket){
 		if(readyCounter == connectCounter){
 			console.log("Start Game");
 			io.emit('start game', "test");
-			assignRoles (playerList)
+			console.log(assignRoles(playerList));
 
 		}
 	});
