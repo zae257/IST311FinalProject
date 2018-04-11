@@ -16,13 +16,13 @@ io.on('connection', function(socket){
 	socket.on('player name', function(name){
 		playerList.push({username: name, role: ''});
 		console.log(playerList);
-		io.emit('chat message', playerList);
+		io.emit('displayUsernames', playerList);
 
 	});
 
 	socket.on('player ready', function(){
 		readyCounter++;	
-		console.log("Read Counter is: " + readyCounter );
+		console.log("Ready Counter is: " + readyCounter );
 		if(readyCounter == connectCounter){
 			console.log("Start Game");
 			io.emit('start game', "test");

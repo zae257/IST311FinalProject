@@ -35,14 +35,14 @@
   		var socket = io();
   		var username = prompt("Enter a username", "Sword");
   		var i =0;
-  		var playerList = "";
   		if(username != null){
   			socket.emit('player name', username);
   		}
 
-  		socket.on('chat message', function(name){
-  			for(i = 0; i < name.length; i++){
-  				playerList +="<li>" +  name[i] + "<br>";
+  		socket.on('displayUsernames', function(namesList){
+        var playerList = "";
+  			for(i = 0; i < namesList.length; i++){
+  				playerList +="<li>" +  namesList[i].username + "<br>";
   			}
   			$('#players').append(playerList + "-----------");
   		});
