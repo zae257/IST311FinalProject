@@ -14,23 +14,37 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
 	socket.on('player name', function(name){
-		playerList.push({username: name, role: ''});
-		console.log(playerList);
+		playerList.push({SocketID: '', username: name, role: ''});
+		//console.log(playerList);
 		io.emit('displayUsernames', playerList);
-
+		console.log(Object.keys(io.sockets.sockets));
+	});
+	
+	
+	socket.on('send sessionid', function(id){
+		playerList[playerList.length -1].SocketID = id;
+		console.log(playerList);
 	});
 
 	socket.on('player ready', function(){
 		readyCounter++;	
 		console.log("Ready Counter is: " + readyCounter );
 		if(readyCounter == connectCounter){
+			assignRoles(playerList);
 			console.log("Start Game");
 			io.emit('start game', "test");
-			console.log(assignRoles(playerList));
-
+			console.log(playerList);
 		}
 	});
+	
+	
 
+	
+	
+	
+	
+	
+	
 	socket.on('disconnect', function() { connectCounter--; console.log("Connect Counter is: " + connectCounter)});
 });
 

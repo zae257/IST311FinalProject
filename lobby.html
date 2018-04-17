@@ -4,7 +4,7 @@
 		<title>Socket.IO chat</title>
 		<style>
 		* { margin: 0; padding: 0; box-sizing: border-box; }
-		body { font: 13px Helvetica, Arial; }
+		body { font: 18px Helvetica, Arial; }
 		form { background: #000; padding: 3px; bottom: 0; width: 100%; }
 		form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
 		form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
@@ -21,14 +21,16 @@
 
 
   </form>-->
+  <center><div id="timer">
+		</div>
+		</center>
   <div id="lobbyInfo">
   	<h1>PlayerList</h1>
   	<ul id = "players">
   		<p>first</p>
   		<input type="button" value="Ready up" id="ready" onClick = "countdown"/><br>
   	</ul>
-		<div id="timer">
-		</div>
+		
   </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
@@ -37,20 +39,42 @@
   		var socket = io();
   		var username = prompt("Enter a username", "Sword");
   		var i =0;
+		socket.on('connect', function(){
+		
+		
   		if(username != null){
   			socket.emit('player name', username);
+			//socket.emit('player name', )
+			var sessionid = socket.io.engine.id;
+			socket.emit('send sessionid', sessionid);
+			
   		}
+		});
 
   		socket.on('displayUsernames', function(namesList){
         var playerList = "";
   			for(i = 0; i < namesList.length; i++){
-  				playerList +="<li>" +  namesList[i].username + "<br>";
+  				playerList +="<li class='playerClass'>" +  namesList[i].username + "<br/></li>";
   			}
+			$('.playerClass').remove();
   			$('#players').append(playerList + "-----------");
   		});
 
   		socket.on('start game', function(){
   			$('#lobbyInfo').remove();
+			var time = 30;
+			var elem = document.getElementById('timer');
+			var timerId = setInterval(countdown, 1000);
+			function countdown() {
+				if (time == 0) {
+					clearTimeout(timerId);
+					elem.innerHTML = "Time is up"
+					socket.emit('night transition', username);
+				} else {
+					elem.innerHTML = time + ' seconds'
+					time--;
+		}
+	}
   		});
   		$('#ready').click(function(){
   			$(this).val("Wait for others");
@@ -61,20 +85,7 @@
 
   	});
   </script>
-  <script>
-		var time = 30;
-		var elem = document.getElementById('timer');
-		var timerId = setInterval(countdown, 1000);
-		function countdown() {
-		if (time == 0) {
-			clearTimeout(timerId);
-			elem.innerHTML = "Time is up"
-		} else {
-			elem.innerHTML = time + ' seconds'
-			time--;
-		}
-	}
-</script>
+
 
 </body>
 </html>
