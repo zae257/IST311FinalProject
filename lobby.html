@@ -18,15 +18,17 @@
 	<ul id="messages"></ul>
     <!--<form action="" id="sendChat">
       <input id="m" autocomplete="off" /><button>Send</button>
-	  
-	  
+
+
   </form>-->
   <div id="lobbyInfo">
   	<h1>PlayerList</h1>
   	<ul id = "players">
   		<p>first</p>
-  		<input type="button" value="Ready up" id="ready"/><br>
+  		<input type="button" value="Ready up" id="ready" onClick = "countdown"/><br>
   	</ul>
+		<div id="timer">
+		</div>
   </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
@@ -49,7 +51,6 @@
 
   		socket.on('start game', function(){
   			$('#lobbyInfo').remove();
-
   		});
   		$('#ready').click(function(){
   			$(this).val("Wait for others");
@@ -63,15 +64,17 @@
   <script>
 		var time = 30;
 		var elem = document.getElementById('timer');
-
 		var timerId = setInterval(countdown, 1000);
-
 		function countdown() {
 		if (time == 0) {
 			clearTimeout(timerId);
 			elem.innerHTML = "Time is up"
 		} else {
-			elem.innerHTML = time + ' seconds
+			elem.innerHTML = time + ' seconds'
+			time--;
+		}
+	}
+</script>
 
 </body>
 </html>
