@@ -7,7 +7,19 @@ var readyCounter = 0;
 var ranPlayerM = 0;
 var ranPlayerD = 0;
 var ranPlayerI = 0;
+var time;
+var timerId
 
+
+function countdown() {
+	if (time == 0) {
+		clearTimeout(timerId);
+	} else {
+		console.log(time + ' seconds');
+		time--;
+	}
+}
+	
 app.get('/', function(req, res){
 	res.sendFile(__dirname + '/lobby.html');
 });
@@ -25,6 +37,9 @@ io.on('connection', function(socket){
 		playerList[playerList.length -1].SocketID = id;
 		console.log(playerList);
 	});
+	
+	
+	
 
 	socket.on('player ready', function(){
 		readyCounter++;	
@@ -32,18 +47,24 @@ io.on('connection', function(socket){
 		if(readyCounter == connectCounter){
 			assignRoles(playerList);
 			console.log("Start Game");
-			io.emit('start game', "test");
+			io.emit('start game', playerList);
 			console.log(playerList);
+			 
+			time = 10;
+			timerId = setInterval(countdown, 1000);
+			
+			console.log("what now");
+			if(time==0){
+				time = 60;
+				timerId = setInterval(countdown, 1000);
+				
+			}
+			
 		}
 	});
 	
 	
 
-	
-	
-	
-	
-	
 	
 	socket.on('disconnect', function() { connectCounter--; console.log("Connect Counter is: " + connectCounter)});
 });

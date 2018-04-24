@@ -2,7 +2,7 @@
 	<html>
 	<head>
 		<title>Socket.IO chat</title>
-		<style>
+		<style> 
 		* { margin: 0; padding: 0; box-sizing: border-box; }
 		body { font: 18px Helvetica, Arial; }
 		form { background: #000; padding: 3px; bottom: 0; width: 100%; }
@@ -21,9 +21,13 @@
 
 
   </form>-->
-  <center><div id="timer">
-		</div>
-		</center>
+  <center>
+	<div id='Time-of-day'></div>
+	<div id="timer"></div>
+	<h1 id="playerRole"></h1>
+	<p id="playerText"></p>
+	<div id ="playerAction"></div>
+  </center>
   <div id="lobbyInfo">
   	<h1>PlayerList</h1>
   	<ul id = "players">
@@ -38,14 +42,17 @@
   	$(function () {
   		var socket = io();
   		var username = prompt("Enter a username", "Sword");
-  		var i =0;
+  		var i=0;
+		var j=0;
+		var sessionid;
+		var role;
+		
 		socket.on('connect', function(){
-		
-		
+		sessionid = socket.io.engine.id;
   		if(username != null){
   			socket.emit('player name', username);
 			//socket.emit('player name', )
-			var sessionid = socket.io.engine.id;
+			
 			socket.emit('send sessionid', sessionid);
 			
   		}
@@ -60,22 +67,49 @@
   			$('#players').append(playerList + "-----------");
   		});
 
-  		socket.on('start game', function(){
+  		socket.on('start game', function(roleList){
   			$('#lobbyInfo').remove();
+			
 			var time = 30;
 			var elem = document.getElementById('timer');
-			var timerId = setInterval(countdown, 1000);
-			function countdown() {
-				if (time == 0) {
-					clearTimeout(timerId);
-					elem.innerHTML = "Time is up"
-					socket.emit('night transition', username);
-				} else {
-					elem.innerHTML = time + ' seconds'
-					time--;
-		}
-	}
+			
+			
+			
+			for(j=0; j<roleList.length;j++){
+				if(roleList[j].SocketID == sessionid){
+					if(roleList[j].role == "Mafia"){
+						$('#playerRole').append("You are a Mafia");
+						$('#playerText').append("Choose a player to kill tonight");
+						$('#playerAction').append('<button>Kill Me</button>');
+					}
+					if(roleList[j].role == "Investigator"){
+
+						$('#playerRole').append("You are an Investegator");
+						$('#playerText').append("Choose a player to investigate tonight");
+					}
+					if(roleList[j].role == "Doctor"){
+
+						$('#playerRole').append("Your are a Doctor");
+						$('#playerText').append("Choose a player to heal tonight");
+					}
+					if(roleList[j].role == "Town"){
+					
+						$('#playerRole').append("Your are a Townsperson");
+					}
+					var timerId = setInterval(countdown, 1000);
+					$('#playerAction').hide();
+					$('#playerText').hide();
+					
+				}
+				
+			}
+			
+			
+			
+			
   		});
+		
+		
   		$('#ready').click(function(){
   			$(this).val("Wait for others");
   			document.getElementById("ready").disabled = true;
