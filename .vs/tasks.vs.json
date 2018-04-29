@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskName": "task-IST311FinalProject",
+      "appliesTo": "/",
+      "type": "launch"
+    }
+  ]
+}

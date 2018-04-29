@@ -9,25 +9,19 @@ var ranPlayerD = 0;
 var ranPlayerI = 0;
 var time;
 var timerId
+var votes = [];
 
 
-function countdown() {
-	if (time == 0) {
-		clearTimeout(timerId);
-	} else {
-		console.log(time + ' seconds');
-		time--;
-	}
-}
 	
 app.get('/', function(req, res){
 	res.sendFile(__dirname + '/lobby.html');
 });
 
-io.on('connection', function(socket){
+io.on('connection', function (socket) {
+    console.log("damn");
 	socket.on('player name', function(name){
-		playerList.push({SocketID: '', username: name, role: ''});
-		//console.log(playerList);
+		playerList.push({SocketID: '', username: name, role: '', status :'alive', });
+		console.log(playerList);
 		io.emit('displayUsernames', playerList);
 		console.log(Object.keys(io.sockets.sockets));
 	});
@@ -49,21 +43,21 @@ io.on('connection', function(socket){
 			console.log("Start Game");
 			io.emit('start game', playerList);
 			console.log(playerList);
-			 
-			time = 10;
-			timerId = setInterval(countdown, 1000);
-			
-			console.log("what now");
-			if(time==0){
-				time = 60;
-				timerId = setInterval(countdown, 1000);
-				
+
+            setTimeout(function () { io.emit('startnight', ); startnight()}, 20000);
 			}
 			
-		}
-	});
-	
-	
+    });
+
+    io.on('vote', function (vote) {
+        console.log(vote);
+        for (i = 0; i < playerList.length; i++) {
+            if (playerList[i].SocketID == vote.id) {
+                playerList[i].vote == vote.targ;
+            }
+        }
+    });
+
 
 	
 	socket.on('disconnect', function() { connectCounter--; console.log("Connect Counter is: " + connectCounter)});
@@ -98,7 +92,40 @@ function assignRoles (playerList){
 	return playerList;
 }
 
+function startday() {  // daytime
+    countdownday()
 
+
+}
+
+function startnight() { // night time
+    var votes = [];
+    votes = playerList.vote;
+    votes += playerList.username;
+    //var result = countVotes(votes);
+    //result.sort;
+    //result.reverse;
+   // console.log(result);
+    //var hung = [];
+   // hung[0] = result[0, 0];
+    //hung[1] = result[0, 1]; 
+    io.emit('votereults', )
+    countdownnight()
+
+}
+
+function countVotes(arr) {
+
+}
+
+function countdownday() { // time our days
+    setTimeout(function () { io.emit('startnight', ); startnight(); }, 900000);
+}
+
+
+function countdownnight() { // time our nights
+    setTimeout(function () { io.emit('startday', ); startday(); }, 300000);
+}
 
 io.on('connect', function() { connectCounter++; console.log("Connect Counter is: " + connectCounter); });
 

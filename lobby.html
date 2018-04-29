@@ -1,7 +1,7 @@
 	<!doctype html>
 	<html>
 	<head>
-		<title>Socket.IO chat</title>
+		<title>Mafia game</title>
 		<style> 
 		* { margin: 0; padding: 0; box-sizing: border-box; }
 		body { font: 18px Helvetica, Arial; }
@@ -11,114 +11,202 @@
 		#messages { list-style-type: none; margin: 0; padding: 0; }
 		li { padding: 5px 10px; }
 		li:nth-child(odd) { background: #eee; }
+        button {border-radius: 4px;border: 2px solid #4CAF50;; width:100px}
 	</style>
 </head>
 <body>
 	<h1></h1>
 	<ul id="messages"></ul>
-    <!--<form action="" id="sendChat">
-      <input id="m" autocomplete="off" /><button>Send</button>
+    <center>
+        <div id='Time-of-day'></div>
+        <div id="timer"></div>
+        <h1 id="playerRole"></h1>
+        <p id="playerText"></p>
+        <div id="playerAction"></div>
+        <div id="playersVote"></div>
+        <div id="lobbyInfo">
+            <br />
+            <h1>PlayerList</h1>
+            <ul id="players">
+                <input type="button" value="Ready up" id="ready" onClick="countdown" />
+                <br>
+            </ul>
+
+        </div>
+        <div id="log" style="height:300px;width:400px;border:1px solid #ccc;overflow:scroll;"></div>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+        <script>
+            $(function () {
+                $('#playersVote').hide();
+                $('#log').hide();
+                var socket = io();
+                var username = prompt("Enter a username", "Name");
+                var i = 0;
+                var j = 0;
+                var sessionid;
+                var role;
+                var vote = [];
+                var mynum;
+                var players = [];
+
+                var time = "day"; // manage time
 
 
-  </form>-->
-  <center>
-	<div id='Time-of-day'></div>
-	<div id="timer"></div>
-	<h1 id="playerRole"></h1>
-	<p id="playerText"></p>
-	<div id ="playerAction"></div>
-  </center>
-  <div id="lobbyInfo">
-  	<h1>PlayerList</h1>
-  	<ul id = "players">
-  		<p>first</p>
-  		<input type="button" value="Ready up" id="ready" onClick = "countdown"/><br>
-  	</ul>
-		
-  </div>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-  <script>
-  	$(function () {
-  		var socket = io();
-  		var username = prompt("Enter a username", "Sword");
-  		var i=0;
-		var j=0;
-		var sessionid;
-		var role;
-		
-		socket.on('connect', function(){
-		sessionid = socket.io.engine.id;
-  		if(username != null){
-  			socket.emit('player name', username);
-			//socket.emit('player name', )
-			
-			socket.emit('send sessionid', sessionid);
-			
-  		}
-		});
+                socket.on('connect', function () {
+                    sessionid = socket.io.engine.id;
+                    if (username != null) {
+                        socket.emit('player name', username);
+                        //socket.emit('player name', )
 
-  		socket.on('displayUsernames', function(namesList){
-        var playerList = "";
-  			for(i = 0; i < namesList.length; i++){
-  				playerList +="<li class='playerClass'>" +  namesList[i].username + "<br/></li>";
-  			}
-			$('.playerClass').remove();
-  			$('#players').append(playerList + "-----------");
-  		});
+                        socket.emit('send sessionid', sessionid);
 
-  		socket.on('start game', function(roleList){
-  			$('#lobbyInfo').remove();
-			
-			var time = 30;
-			var elem = document.getElementById('timer');
-			
-			
-			
-			for(j=0; j<roleList.length;j++){
-				if(roleList[j].SocketID == sessionid){
-					if(roleList[j].role == "Mafia"){
-						$('#playerRole').append("You are a Mafia");
-						$('#playerText').append("Choose a player to kill tonight");
-						$('#playerAction').append('<button>Kill Me</button>');
-					}
-					if(roleList[j].role == "Investigator"){
+                    }
+                });
 
-						$('#playerRole').append("You are an Investegator");
-						$('#playerText').append("Choose a player to investigate tonight");
-					}
-					if(roleList[j].role == "Doctor"){
+                socket.on('displayUsernames', function (namesList) {
+                    var playerList = "";
+                    $('#playersVote').empty();
 
-						$('#playerRole').append("Your are a Doctor");
-						$('#playerText').append("Choose a player to heal tonight");
-					}
-					if(roleList[j].role == "Town"){
-					
-						$('#playerRole').append("Your are a Townsperson");
-					}
-					var timerId = setInterval(countdown, 1000);
-					$('#playerAction').hide();
-					$('#playerText').hide();
-					
-				}
-				
-			}
-			
-			
-			
-			
-  		});
-		
-		
-  		$('#ready').click(function(){
-  			$(this).val("Wait for others");
-  			document.getElementById("ready").disabled = true;
-  			socket.emit('player ready', "test");
-  		});
+                    //jh
+                    var table = document.createElement('table');
+                    var th = document.createElement('th');
+                    var tdPlayer = document.createElement('td');
+                    var tdVote = document.createElement('td');
+                    tdPlayer.innerHTML = "Players";
+                    tdVote.innerHTML = "choose";
+                    th.style.alignContent = "center";
+                    th.appendChild(tdPlayer);
+                    th.appendChild(tdVote);
+                    table.appendChild(th);
+
+                    //jh
+                    // editing the table
+                    var vbid;
+                    table.width = "400px";
+                    table.style.alignContent = "center";
+                    table.id = "voteTable";
+                    var num;
+                    $('#players').append(playerList + "-----------");
+                    for (i = 0; i < namesList.length; i++) {
+                        playerList += "<li class='playerClass'>" + namesList[i].username + "<br/></li>";
+
+                        num = String(i);
+                        vbid = "pvb" + num;
+
+                        //jh
+                        var tr = document.createElement('tr');
+
+                        var tdName = document.createElement('td');
+                        tdName.innerHTML = namesList[i].username;
+
+                        var tdBtn = document.createElement('td');
+                        tdBtn.style.alignContent = "right";
+                        var button = document.createElement('button');
+                        button.className = 'voteBtn';
+                        button.innerHTML = 'Choose';
+                        button.value = namesList[i].username;
+
+                        tdBtn.appendChild(button);
+
+                        tr.appendChild(tdName);
+                        tr.appendChild(tdBtn);
+
+                        table.appendChild(tr);
+
+                        //jh
+
+                        button.id = vbid; // give the button an id
+                        console.log(button.id);
+                    }
+                    
+                    $('#playersVote').append(table);//jh
+                    $('.playerClass').remove();
+                    $('#players').append(playerList + "");
 
 
-  	});
-  </script>
+                });
+
+                socket.on('start game', function (roleList) {
+                    $('#lobbyInfo').remove();
+                    $('#playersVote').show(); //jh
+
+                    $('#log').show();
+                    var time = 30;
+                    var elem = document.getElementById('timer');
+
+
+
+                    for (j = 0; j < roleList.length; j++) {
+                        if (roleList[j].SocketID == sessionid) {
+                            players = roleList;
+                            mynum = j; // for use in the rest of the program
+                            vbid = "pvb" + String(j);
+                            console.log(vbid);
+                            if (roleList[j].role == "Mafia") {
+                                $('#playerRole').append("You are a Mafia");
+                                $('#playerText').append("Choose a player to kill tonight");
+                                $('#' + vbid).remove();
+
+                            }
+                            if (roleList[j].role == "Investigator") {
+                                $('#playerRole').append("You are an Investigator");
+                                $('#playerText').append("Choose a player to investigate tonight");
+                                $('#' + vbid).remove();
+                            }
+                            if (roleList[j].role == "Doctor") {
+
+                                $('#playerRole').append("You are a Doctor");
+                                $('#playerText').append("Choose a player to heal tonight");
+                            }
+                            if (roleList[j].role == "Town") {
+                                $('#playerRole').append("You are a Townsperson");
+                                $('#playerText').append("Don't let the mafia kill all of you!");
+                                $('#' + vbid).remove();
+                            }
+                            $('#playerAction').hide();
+
+                        }
+                    }
+                    $('#log').append("Day one has started, prepare for night <br>");
+                    
+                });
+
+                socket.on('startnight', function () {
+                    $('#log').append("Night roles pick your targets <br>");
+                });
+
+                socket.on('startday', function () {
+                    //if (death != "") { $('#log').append(players[username].name + "is dead! \n"); }
+
+                            $('#log').append("Discuss the events and vote for mafia. <br>");
+
+                });
+
+
+                $('#ready').click(function () {
+                    $(this).val("Wait for others");
+                    document.getElementById("ready").disabled = true;
+                    socket.emit('player ready', "test");
+                });
+
+                $('.voteBtn').click(function () {  
+                    console.log("cry")
+                    vote.id = sessionid;
+                    var str = this.id;
+                    var target = Number(str.charAt(3));
+                    vote.targ = target;
+                    console.log(vote);
+                    socket.emit('vote', vote);
+
+                    $('#log').append(username + " has voted against " + players[target].username + " <br> " );
+                });
+
+                
+
+
+            });
+        </script>
 
 
 </body>
