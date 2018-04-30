@@ -18,12 +18,11 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function (socket) {
-    console.log("damn");
 	socket.on('player name', function(name){
 		playerList.push({SocketID: '', username: name, role: '', status :'alive', });
-		console.log(playerList);
+		//console.log(playerList);
 		io.emit('displayUsernames', playerList);
-		console.log(Object.keys(io.sockets.sockets));
+		//console.log(Object.keys(io.sockets.sockets));
 	});
 	
 	
